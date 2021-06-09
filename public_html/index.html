@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Bootstrap</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+
+        <div class="container">
+            <h2>Login2Explore</h2>
+            <form id="EmpForm" method="post">
+                <div class="form-group">
+                    <span><label for="email">Email:</label></span>
+                   
+                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+                    
+                </div>
+                <div class="form-group">
+                    <label for="name">Full Name:</label>
+                            
+                    <input type="text" class="form-control" id="name" placeholder="Enter Full Name" name="name">
+                    
+                </div>
+                <div class="form-group">
+                    <label for="phn">Contact Number:</label>
+                    <input type="text" class="form-control" id="phn" placeholder="Number" name="phn">
+                    
+                </div>
+
+                <input type= "button" class= "btn btn-primary" id="save" value="Save" onclick="saveEmployee();">
+            </form>
+        </div>
+        <script>
+            function validateAndGetFormData() {
+                var emailVar = $("#email").val();
+                if (emailVar === "") {
+                    alert("Email Required");
+                    $("email").focus();
+                    return "";
+                }
+                var nameVar = $("#name").val();
+                if (nameVar === "") {
+                    alert("Name Required");
+                    $("name").focus();
+                    return "";
+                }
+                var phnVar = $("#phn").val();
+                if (phnVar === "") {
+                    alert("Contact Number Required");
+                    $("phn").focus();
+                    return "";
+                }
+                var jsonStrObj = {
+                    email: emailVar,
+                    name: nameVar,
+                    phn: phnVar,
+                };
+                return JSON.stringify(jsonStrObj);
+            }
+
+            function createPUTRequest(connToken, jsonObj, dbName, relName) {
+                var putRequest = "{\n"
+                        + "\"token\" :\""
+                        + connToken
+                        + "\","
+                        + "\"dbName\" :\""
+                        + dbName
+                        + "\",\n" + "\"cmd\" : \"PUT\,\n"
+                        + "\"rel\" :\""
+                        + relName + "\","
+                        + "\"jsonStr\" : \n"
+                        + jsonObj
+                        + "\n"
+                        + "}";
+                return putRequest;
+            }
+
+            function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+                var url = dbBaseUrl + apiEndPointUrl;
+                var jsonObj;
+                $.post(url, reqString, function (result) {
+                    jsonObj = JSON.parse(result);
+                }).fail(function (result) {
+                    var dataJsonObj = result.responceText;
+                    jsonObj = JSON.parse(dataJsonObj);
+
+                });
+                return jsonObj;
+
+            }
+            
+            function resetForm(){
+                $("email").val("");
+                $("name").val("");
+                $("phn").val("");
+                $("email").focus();
+            }
+
+            function  saveEmployee() {
+                //validate form data
+                var jsonStr = validateAndGetFormData();
+                if (jsonStr === "") {
+                    return;
+                }
+
+                var putReqStr = createPUTRequest("90936054|-31948841257624363|90933967", jsonStr, "SAMPLE", "EMP-REL");
+                alert(putReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommand(putReqStr, "http://api.login2explore.com:5577", "/api/iml");
+                jQuery.ajaxSetup({async: true});
+                alert(JSON.stringify(resultObl));
+                resetForm();
+
+            }
+        </script>
+
+    </body>
+</html>
